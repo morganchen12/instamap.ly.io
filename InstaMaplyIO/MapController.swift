@@ -65,8 +65,21 @@ final class MapController: UIViewController, CLLocationManagerDelegate {
     
     func drawMap() {
         let width = self.mapView.frame.size.width
-        let height = self.mapView.frame.size.height
-        UIGraphicsBeginImageContext(CGSizeMake(width, height))
+        let height = self.mapView.frame.size.height - self.topLayoutGuide.length
+        let dimension = min(width, height)
+        let contentOffset: CGPoint
+        
+        if height > width {
+            let offset = ((width - height) / 2) - self.topLayoutGuide.length
+            contentOffset = CGPoint(x: 0, y: offset)
+        } else {
+            let offset = (height - width) / 2
+            contentOffset = CGPoint(x: offset, y: -(self.topLayoutGuide.length))
+        }
+        
+        UIGraphicsBeginImageContext(CGSizeMake(dimension, dimension))
+        let context = UIGraphicsGetCurrentContext()
+        CGContextTranslateCTM(context, contentOffset.x, contentOffset.y)
         self.mapView.layer.renderInContext(UIGraphicsGetCurrentContext())
         let mapImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -79,16 +92,17 @@ final class MapController: UIViewController, CLLocationManagerDelegate {
     }
     
     @IBAction func refreshPressed(sender: AnyObject) {
-        self.drawMap()
+        
+        self.updateMapAndDraw()
     }
     
-    func updateMapInBackground() {
+    func updateMapAndDraw() {
         self.updateRegionAnimated(false)
         self.drawMap()
     }
     
     internal func startUpdatingLocationInBackground() {
-        self.updateTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(150), target: self, selector: "updateMapInBackground", userInfo: nil, repeats: true)
+        self.updateTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(150), target: self, selector: "updateMapAndDraw", userInfo: nil, repeats: true)
     }
     
     internal func stopUpdatingLocationInBackground() {
