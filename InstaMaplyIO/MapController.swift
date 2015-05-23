@@ -74,6 +74,7 @@ final class MapController: UIViewController, CLLocationManagerDelegate {
             MPMediaItemPropertyArtwork: MPMediaItemArtwork(image: mapImage),
             MPMediaItemPropertyArtist: "Don't get lost",
             MPMediaItemPropertyTitle: "You Are Here",
+            MPMediaItemPropertyAlbumTitle: "The dream",
         ]
     }
     
